@@ -1,0 +1,10 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="11.679643999999854">
+<testsuite name="apitesting.spec.ts" timestamp="2025-03-21T12:10:16.565Z" hostname="chromium" tests="1" failures="0" skipped="0" time="0.565" errors="0">
+<testcase name="POST a new product" classname="apitesting.spec.ts" time="0.565">
+<system-out>
+<![CDATA[New product created with id: 4
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

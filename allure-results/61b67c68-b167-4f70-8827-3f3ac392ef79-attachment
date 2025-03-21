@@ -1,0 +1,288 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: test
+- Location: E:\JSTS\nhsengproppw\tests\test-2.spec.ts:3:5
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 3000ms exceeded.
+Call log:
+  - waiting for locator('#content').getByRole('link', { name: 'View cart', exact: true })
+
+    at E:\JSTS\nhsengproppw\tests\test-2.spec.ts:25:88
+```
+
+# Page snapshot
+
+```yaml
+- banner:
+  - link "Skip to navigation"
+  - link "Skip to content"
+  - link "Edgewords Shop"
+  - paragraph: e-commerce demo site for Training
+  - search:
+    - text: " Search for:"
+    - searchbox "Search for:"
+    - button "Search"
+  - navigation "Primary Navigation":
+    - list:
+      - listitem:
+        - link "Home"
+      - listitem:
+        - link "Shop"
+      - listitem:
+        - link "Cart"
+      - listitem:
+        - link "Checkout"
+      - listitem:
+        - link "My account"
+      - listitem:
+        - link "Blog"
+    - list:
+      - listitem:
+        - link "Home"
+      - listitem:
+        - link "Blog"
+      - listitem:
+        - link "Cart"
+      - listitem:
+        - link "Checkout"
+      - listitem:
+        - link "My account"
+      - listitem:
+        - link "Sample Page"
+      - listitem:
+        - link "Shop"
+  - list:
+    - listitem:
+      - link "£16.00 1 item "
+    - listitem:
+      - list:
+        - listitem:
+          - link "Remove this item":  ×
+          - link "Cap"
+          - text: 1 × £16.00
+      - paragraph:
+        - strong: "Subtotal:"
+        - text: £16.00
+      - paragraph:
+        - link "View cart "
+        - link "Checkout "
+- navigation "breadcrumbs":
+  - link " Home"
+  - text: / 
+  - link "Accessories"
+  - text: /  Cap
+- alert:
+  - text: 
+  - link "View cart "
+  - text: “Cap” has been added to your cart.
+- main:
+  - text: Sale!
+  - link ""
+  - figure:
+    - link "Cap":
+      - img "Cap"
+  - heading "Cap" [level=1]
+  - paragraph:
+    - insertion: £16.00
+  - text: Cap quantity
+  - spinbutton "Cap quantity": "1"
+  - button "Add to cart"
+  - text: "Category:"
+  - link "Accessories"
+  - tablist:
+    - tab "Description ":
+      - link "Description"
+      - text: 
+    - tab "Reviews (0) ":
+      - link "Reviews (0)"
+      - text: 
+  - tabpanel "Description ":
+    - heading "Description" [level=2]
+    - paragraph: Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
+  - heading "Related products" [level=2]
+  - list:
+    - listitem:
+      - link "Sunglasses £90.00":
+        - heading "Sunglasses" [level=2]
+        - text: £90.00
+      - link "Add “Sunglasses” to your cart": Add to cart
+    - listitem:
+      - link "Belt Sale! £55.00":
+        - heading "Belt" [level=2]
+        - text: Sale!
+        - insertion: £55.00
+      - link "Add “Belt” to your cart": Add to cart
+    - listitem:
+      - link "Beanie Sale! £18.00":
+        - heading "Beanie" [level=2]
+        - text: Sale!
+        - insertion: £18.00
+      - link "Add “Beanie” to your cart": Add to cart
+  - navigation "More products":
+    - link "Beanie "
+    - link "Beanie "
+- complementary:
+  - search:
+    - text: " Search for:"
+    - searchbox "Search for:"
+    - button "Search"
+  - text: Recent Posts
+  - list:
+    - listitem:
+      - text: 
+      - link "Hello world!"
+  - text: Recent Comments
+  - list
+  - text: Archives
+  - list:
+    - listitem:
+      - text: 
+      - link "March 2018"
+  - text: Categories
+  - list:
+    - listitem:
+      - text: 
+      - link "Uncategorized"
+- contentinfo:
+  - text: © Edgewords Shop 2025
+  - link "Built with Storefront & WooCommerce"
+  - text: .
+- text: "You're viewing:"
+- strong: Cap
+- insertion: £16.00
+- link "Add to cart"
+- paragraph:
+  - text:  This is a demo store for testing purposes — no orders shall be fulfilled.
+  - link " Dismiss"
+```
+
+# Test source
+
+```ts
+   1 | import { test, expect } from '@playwright/test';
+   2 |
+   3 | test('test', {tag: ['@smoke','@runme']},async function({ page }){
+   4 |   // Recording...
+   5 |   //await driver.get('https://www.edgewordstraining.co.uk/demo-site/'); //equiv webdriver js
+   6 |   await page.goto('/demo-site/'); //First part of URL is specified as baseUrl in playwright.config.ts
+   7 |   
+   8 |   //Instead of repeating the locator 3 times...
+   9 |   // await page.getByRole('searchbox', { name: 'Search for:' }).click();
+   10 |   // await page.getByRole('searchbox', { name: 'Search for:' }).fill('cap');
+   11 |   // await page.getByRole('searchbox', { name: 'Search for:' }).press('Enter');
+   12 |   //..we can store it in a variable. No need to await the locator, as the search actually happens when the action takes place
+   13 |   const searchBox = page.getByRole('searchbox', { name: 'Search for:' });
+   14 |   await searchBox.click(); //first find element, then do action
+   15 |   await searchBox.fill('cap'); //first find element, then do action
+   16 |   await searchBox.press('Enter'); //first find element, then do action
+   17 |
+   18 |   // Browser->PleaseFindThisElement->When you have it, do this
+   19 |   // This is a common pattern used by other testing tools also e.g. Cypress, WebDriver etc
+   20 |   await page.getByRole('button', { name: 'Add to cart' }).click();
+   21 |
+   22 |   // Last example of equivalent WebDriver code
+   23 |   // Element searches can be chained - i.e. find Element A, inside ELement A find Element B
+   24 |   //await driver.findElement(By.Css('#content)).findElement(By.LinkText('View cart')).click()
+>  25 |   await page.locator('#content').getByRole('link', { name: 'View cart', exact: true }).click(); //name: is case insensitive by default and performs a sub string match
+      |                                                                                        ^ TimeoutError: locator.click: Timeout 3000ms exceeded.
+   26 |   await page.getByRole('link', { name: 'Remove this item' }).click();
+   27 |   await page.getByRole('link', { name: 'Return to shop' }).click();
+   28 |   await page.locator('#menu-item-42').getByRole('link', { name: 'Home' }).click();
+   29 |   
+   30 |   //await page.close();
+   31 | });
+   32 |
+   33 | test('test2', async({page})=>{
+   34 |   //Playwright establishes brand new page contexts for each test.
+   35 |   //There is no need to tear down the browser and spin up a new browser between tests to avoid accidental shared state between tests
+   36 |   // e.g. like in WebDriver 
+   37 |   await page.goto('https://www.google.com/')
+   38 |   //await page.close(); //Forcing the browser to close like this only slows down your test runs as PW will have to spend time reopening the browser for the next test
+   39 | })
+   40 |
+   41 | test('all products', async ({ page }) => {
+   42 |   await page.goto('https://www.edgewordstraining.co.uk/demo-site/');
+   43 |   const newProducts = page.getByLabel('Recent Products');
+   44 |   for (const prod of await newProducts.locator('h2:not(.section-title)').all()) { //gathers a collection of all() matching elements
+   45 |     console.log(await prod.textContent()); //then loops over each individual match logging the text
+   46 |   }; //No need to await console, but you do need to await the locator. Or you will only get the "promise" of the text, not the actual text.
+   47 |   
+   48 | });
+   49 |
+   50 | test('Locator Handler', async ({ page }) => {
+   51 |   // Setup the handler.
+   52 |   const cookieConsent = page.getByRole('heading', { name: 'Hej! You are in control of your cookies.' });
+   53 |   await page.addLocatorHandler(
+   54 |     cookieConsent, //Locator to watch out for
+   55 |     async () => { //If spotted, what to do
+   56 |       await page.getByRole('button', { name: 'Accept all' }).click();
+   57 |     }
+   58 |     , //Optional arguments - can be omitted
+   59 |     {
+   60 |       times: 10, //How many times the locator may appear before the handler should stop handling the locator
+   61 |       //By default Playwright will wait for the locator to no longer be visible before continuing with the test.
+   62 |       noWaitAfter: true //this can be overridden however
+   63 |     }
+   64 |   );
+   65 |
+   66 |   // Now write the test as usual. If at any time the cookie consent form is shown it will be accepted.
+   67 |   await page.goto('https://www.ikea.com/');
+   68 |   await page.getByRole('link', { name: 'Collection of blue and white' }).click();
+   69 |   await expect(page.getByRole('heading', { name: 'Light and easy' })).toBeVisible();
+   70 |
+   71 |   //If you're confident the locator will no longer be found you can de-register the handler
+   72 |   //await page.removeLocatorHandler(cookieConsent);
+   73 |   //If the cookie consent form appears from here on it may cause issues with the test...
+   74 |   await page.waitForTimeout(5000);
+   75 | })
+   76 |
+   77 | test('actions', async({page})=>{
+   78 |   await page.goto('https://www.edgewordstraining.co.uk/webdriver2/docs/index.html');
+   79 |   await page.getByRole('link', { name: 'Forms' }).click();
+   80 |   await page.locator('#textInput').click();
+   81 |   await page.locator('#textInput').fill('Steve Powell');
+   82 |   await page.locator('#textInput').fill('Stephen Powell'); //Fill auto clears the text box before entry (no append)
+   83 |   //await page.locator('#textInput').clear(); //Manually clears the text box "by magic". 99.999% of the time that's fine.
+   84 |   await page.locator('#textInput').press('Control+KeyA'); //However you could use keyboard shortcuts to clear exactly like a user might
+   85 |   await page.locator('#textInput').press('Backspace'); 
+   86 |   await page.locator('#textInput').pressSequentially(' should append', {delay: 200}); //wont clear, just append, and will do so with slow keypresses
+   87 |   await page.locator('#textArea').click();
+   88 |   await page.locator('#textArea').fill('was\nhere\n'); //Multiline text entry - \n = new line
+   89 |   await page.locator('#checkbox').check(); //Ensure checkbox is on
+   90 |   await page.locator('#checkbox').click(); //Toggle off
+   91 |   await page.locator('#checkbox').click(); //Toggle on
+   92 |   await page.locator('#checkbox').uncheck(); //Force off
+   93 |   await page.locator('#select').selectOption('Selection Two');
+   94 |   await page.locator('#two').check(); //Also works for radio buttons
+   95 |   await expect.soft(page.locator('input[type=radio]')).toHaveCount(2); //Soft asserts fail the test but allow code execution to continue within the test
+   96 |   await expect(page.locator('input[type=radio]')).toHaveCount(3); //A (non soft) failed assertion will stop and fail the test here. The following line would not execute.
+   97 |   await page.getByRole('link', { name: 'Submit' }).click();
+   98 | });
+   99 |
+  100 | test('drag drop slider', async ({ page }) => {
+  101 |   await page.goto('https://www.edgewordstraining.co.uk/webdriver2/docs/cssXPath.html')
+  102 |
+  103 |   await page.locator('#apple').scrollIntoViewIfNeeded();
+  104 |   //Dragging 'outside' of an element normally fails due to 'actionability' checks. force:true tells Playwright just to do the action skipping any checks.
+  105 |   await page.dragAndDrop('#slider a', '#slider a', {targetPosition: {x: 100, y:0}, force: true}) //While this moves the gripper it wont change the size of the apple - this is due to the JS on the page that does the resizing not firing properly for large movements
+  106 |   //await page.click('css=#slider a') //Old way of clicking things - stilll works but prefer page-findelement-click
+  107 |   await page.locator('#slider a').click();
+  108 |   //So instead do lots of little jumps. Just make sure that you 'jump' far enough to get 'outside' the gripper each time
+  109 |   // await page.dragAndDrop('#slider a', '#slider a', { targetPosition: { x: 20, y: 0 }, force: true })
+  110 |   // await page.dragAndDrop('#slider a', '#slider a', { targetPosition: { x: 20, y: 0 }, force: true })
+  111 |   // await page.dragAndDrop('#slider a', '#slider a', { targetPosition: { x: 20, y: 0 }, force: true })
+  112 |   // await page.dragAndDrop('#slider a', '#slider a', { targetPosition: { x: 20, y: 0 }, force: true })
+  113 |   //We should probably write a custom function for this 'lots of little jumps' drag and drop... e.g. 
+  114 |   //await smoothDrag(page, '#slider a', 200, 5); //ToDo: write this function. 200 is the distance to move, 5 is the number of "jumps"
+  115 |
+  116 | })
+```
